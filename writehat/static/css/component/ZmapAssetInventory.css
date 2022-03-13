@@ -1,0 +1,10 @@
+table.asset-inventory,
+table.asset-inventory th,
+table.asset-inventory td {
+    border: 1px solid black;
+}
+
+table.asset-inventory {
+    border-collapse: collapse;
+    width: 100%;
+}

@@ -1,9 +1,31 @@
 {% load custom_tags %}
 <section class="l{{ level }} component{% if pageBreakBefore %} page-break{% endif %}" id="container_{{ id }}">
   {% include 'componentTemplates/Heading.html' %}
-  <div class='markdown-align-justify custom-component-summary'>
-    <p>
-      {{ assets }}
-    </p>
+  <div class='markdown-align-justify custom-component-asset-inventory'>
+    <h2>Asset Inventory Summary</h2>
+    <table class="asset-inventory">
+      <tr><th>IP Address</th><th>Hostname</th><th>OS</th><th>Installed Tools</th><th>Vulnerabilities</th><th>Open Ports</th><th>Default Creds</th></tr>
+      {% for asset in assets %}
+        <tr>
+          <td>{{ asset.ip_address }}</td>
+          <td>{{ asset.hostname }}</td>
+          <td>{{ asset.os }}</td>
+          <td>{{ asset.installed_tools }}</td>
+          <td>{{ asset.vulnerabilities }}</td>
+          <td>{{ asset.open_ports }}</td>
+          <td>{{ asset.default_creds }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+    <h2>OS Breakdown</h2>
+    <p>ADD ME</p>
+    <h2>Port Breakdown</h2>
+    <p>ADD ME</p>
+    <h2>Default Credentials</h2>
+    <p>ADD ME</p>
+    <h2>EDR/AV tools</h2>
+    <p>ADD ME</p>
+    <h2>other security controls (iboss, bigfix, etc.)</h2>
+    <p>ADD ME</p>
   </div>
 </section>
