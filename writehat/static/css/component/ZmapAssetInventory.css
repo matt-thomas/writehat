@@ -1,15 +1,15 @@
-table.asset-inventory,
-table.asset-inventory th,
-table.asset-inventory td {
+.custom-component-asset-inventory table,
+.custom-component-asset-inventory table th,
+.custom-component-asset-inventory table td {
     border: 1px solid black;
 }
 
-table.asset-inventory {
+.custom-component-asset-inventory table {
     border-collapse: collapse;
     width: 100%;
 }
 
-table.asset-inventory th,
-table.asset-inventory td {
+.custom-component-asset-inventory table th,
+.custom-component-asset-inventory table td {
     padding: 3px 3px;
 }
