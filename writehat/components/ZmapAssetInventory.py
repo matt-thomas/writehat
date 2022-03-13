@@ -3,7 +3,39 @@ import re
 
 from .base import *
 
+# Shared lists.
 
+TOOLS_COLUMNS = [
+    'wmi',
+    'defender',
+    'symantec',
+    'altiris',
+    'cisco_fireamp',
+    'cisco_anyconnect',
+    'snare',
+    'malwarebytes',
+    'ivanti',
+    'sophos',
+    'webroot',
+    'kaseya',
+    'carbon_black',
+    'red_cloak',
+    'splunk',
+    'bitdefender',
+    'solarwinds',
+    'crowdstrike',
+]
+
+VULN_COLUMNS = [
+    'vulnerable_to_eternalblue',
+]
+
+DEFAULT_CRED_COLUMNS = [
+    'default_ssh_login',
+    'open_ftp',
+    'open_nfs',
+    'open_vnc',
+]
 
 class ZmapAssetInventoryForm(ComponentForm):
 
@@ -38,6 +70,7 @@ class Component(BaseComponent):
         # TODO Figure out why files can't upload and move the processing logic to the save method.
 
         context['assets'] = []
+        raw_csv_rows = []
         try:
             # TODO change this to use the uploaded file, once we figure out Django/Writehat issue.
             csv_filename = "example_asset.csv"
@@ -45,15 +78,22 @@ class Component(BaseComponent):
             with open(csv_filename, 'r') as csv_file:
                 reader = csv.DictReader(csv_file)
                 for row in reader:
-                    new_row = parse_row(row)
+                    # Add row to our raw list for stats generation.
+                    raw_csv_rows.append(row)
+                    # Parse row for summary table and add to context.
+                    new_row = parse_summary_row(row)
                     context['assets'].append(new_row)
 
         except:
             log.exception("Error parsing ZMAP asset CSV.")
 
+        context['stats'] = generate_stats(raw_csv_rows)
+
         return context
 
-def parse_row(row):
+
+# Takes an asset object and formats for the summary table.
+def parse_summary_row(row):
     # Format column names for easier parsing in template.
     new_row = {}
     for key in row.keys():
@@ -63,29 +103,8 @@ def parse_row(row):
     log.info(new_row)
 
     # Parse tools.
-    tools_columns = [
-        'wmi',
-        'defender',
-        'symantec',
-        'altiris',
-        'cisco_fireamp',
-        'cisco_anyconnect',
-        'snare',
-        'malwarebytes',
-        'ivanti',
-        'sophos',
-        'webroot',
-        'kaseya',
-        'carbon_black',
-        'red_cloak',
-        'splunk',
-        'bitdefender',
-        'solarwinds',
-        'crowdstrike',
-    ]
-
     host_tools = []
-    for tools_column in tools_columns:
+    for tools_column in TOOLS_COLUMNS:
         if tools_column in new_row:
             if len(new_row[tools_column]) > 0:
                 host_tools.append(tools_column)
@@ -98,12 +117,8 @@ def parse_row(row):
         new_row['installed_tools'] = "None found"
 
     # Parse vulnerabilities.
-    vuln_columns = [
-        'vulnerable_to_eternalblue',
-    ]
-
     host_vulns = []
-    for vuln_column in vuln_columns:
+    for vuln_column in VULN_COLUMNS:
         if vuln_column in new_row:
             if len(new_row[vuln_column]) > 0:
                 host_vulns.append(vuln_column)
@@ -116,15 +131,8 @@ def parse_row(row):
         new_row['vulnerabilities'] = "None found"
 
     # Parse open ports.
-    # We will use regex here because there may be unique portscan requirements.
-    port_columns = []
-    for column in new_row.keys():
-        # TODO Determine if we need to actually validate the port (ex. 1 - 65535)
-        # @See https://stackoverflow.com/questions/40665068/python-regex-match-number-followed-by-string-or-nothing
-        match_port = re.match(r'^\d+(?:/tcp.*|/udp)?$', column)
-        if match_port:
-            port_columns.append(column)
-
+    # TODO probably don't need to do this for every row.
+    port_columns = get_port_columns(new_row)
     host_ports = []
     for port_column in port_columns:
         if port_column in new_row:
@@ -139,15 +147,8 @@ def parse_row(row):
         new_row['open_ports'] = "None found"
 
     # Parse default creds.
-    default_cred_columns = [
-        'default_ssh_login',
-        'open_ftp',
-        'open_nfs',
-        'open_vnc',
-    ]
-
     host_default_creds = []
-    for default_cred_column in default_cred_columns:
+    for default_cred_column in DEFAULT_CRED_COLUMNS:
         if default_cred_column in new_row:
             if len(new_row[default_cred_column]) > 0:
                 host_default_creds.append(default_cred_column)
@@ -162,4 +163,43 @@ def parse_row(row):
     return new_row
 
 
+# Generates the statistics section of the report.
+def generate_stats(raw_csv_rows):
+    stats = []
 
+    stats.append({
+        'section_title': 'OS Breakdown',
+    })
+
+    stats.append({
+        'section_title': 'Port Breakdown',
+    })
+
+    stats.append({
+        'section_title': 'Default Credentials',
+    })
+
+    stats.append({
+        'section_title': 'EDR/AV tools',
+    })
+
+    stats.append({
+        'section_title': 'other security controls (iboss, bigfix, etc.)',
+    })
+
+    return stats
+
+
+# Helper for getting the port columns of a given asset row.
+def get_port_columns(new_row):
+    # Parse open ports.
+    # We will use regex here because there may be unique portscan requirements.
+    port_columns = []
+    for column in new_row.keys():
+        # TODO Determine if we need to actually validate the port (ex. 1 - 65535)
+        # @See https://stackoverflow.com/questions/40665068/python-regex-match-number-followed-by-string-or-nothing
+        match_port = re.match(r'^\d+(?:/tcp.*|/udp)?$', column)
+        if match_port:
+            port_columns.append(column)
+
+    return port_columns

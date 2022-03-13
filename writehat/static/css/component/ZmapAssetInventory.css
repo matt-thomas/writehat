@@ -8,3 +8,8 @@ table.asset-inventory {
     border-collapse: collapse;
     width: 100%;
 }
+
+table.asset-inventory th,
+table.asset-inventory td {
+    padding: 3px 3px;
+}

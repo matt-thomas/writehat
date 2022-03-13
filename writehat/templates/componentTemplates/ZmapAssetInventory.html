@@ -4,7 +4,15 @@
   <div class='markdown-align-justify custom-component-asset-inventory'>
     <h2>Asset Inventory Summary</h2>
     <table class="asset-inventory">
-      <tr><th>IP Address</th><th>Hostname</th><th>OS</th><th>Installed Tools</th><th>Vulnerabilities</th><th>Open Ports</th><th>Default Creds</th></tr>
+      <tr>
+        <th>IP Address</th>
+        <th>Hostname</th>
+        <th>OS</th>
+        <th>Installed Tools</th>
+        <th>Vulnerabilities</th>
+        <th>Open Ports</th>
+        <th>Default Creds</th>
+      </tr>
       {% for asset in assets %}
         <tr>
           <td>{{ asset.ip_address }}</td>
@@ -17,15 +25,9 @@
         </tr>
       {% endfor %}
     </table>
-    <h2>OS Breakdown</h2>
-    <p>ADD ME</p>
-    <h2>Port Breakdown</h2>
-    <p>ADD ME</p>
-    <h2>Default Credentials</h2>
-    <p>ADD ME</p>
-    <h2>EDR/AV tools</h2>
-    <p>ADD ME</p>
-    <h2>other security controls (iboss, bigfix, etc.)</h2>
-    <p>ADD ME</p>
+    {% for stats_section in stats %}
+      <h2>{{ stats_section.section_title }}</h2>
+      <p>TODO</p>
+    {% endfor %}
   </div>
 </section>
