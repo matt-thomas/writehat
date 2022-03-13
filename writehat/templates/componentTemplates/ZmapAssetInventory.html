@@ -1,0 +1,49 @@
+{% load custom_tags %}
+<section class="l{{ level }} component{% if pageBreakBefore %} page-break{% endif %}" id="container_{{ id }}">
+  {% include 'componentTemplates/Heading.html' %}
+  <div class='markdown-align-justify custom-component-asset-inventory'>
+    <h2>Asset Inventory Summary</h2>
+    <table class="asset-inventory">
+      <tr>
+        <th>IP Address</th>
+        <th>Hostname</th>
+        <th>OS</th>
+        <th>Installed Tools</th>
+        <th>Vulnerabilities</th>
+        <th>Open Ports</th>
+        <th>Default Creds</th>
+      </tr>
+      {% for asset in assets %}
+        <tr>
+          <td>{{ asset.ip_address }}</td>
+          <td>{{ asset.hostname }}</td>
+          <td>{{ asset.os }}</td>
+          <td>{{ asset.installed_tools }}</td>
+          <td>{{ asset.vulnerabilities }}</td>
+          <td>{{ asset.open_ports }}</td>
+          <td>{{ asset.default_creds }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+    {% for stats_section in stats %}
+      <h2>{{ stats_section.section_title }}</h2>
+      <table class="{{ stats_section.section_class }}">
+        <tr>
+          {% for header in stats_section.table_headers %}
+            <th>{{ header }}</th>
+          {% endfor %}
+        </tr>
+        <tr>
+          {% for key, values in stats_section.distribution.items %}
+              <tr><td>{{ key }} </td>
+                <!-- The labeling here is super confusing, but really if you look at the data structure it will make sense. It's just unpacking the values from the dict. -->
+                {% for value in values.values %}
+                  <td>{{ value }}</td>
+                {% endfor %}
+              </tr>
+          {% endfor %}
+        </tr>
+      </table>
+    {% endfor %}
+  </div>
+</section>
