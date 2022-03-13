@@ -120,8 +120,9 @@ def parse_row(row):
     port_columns = []
     for column in new_row.keys():
         # TODO Determine if we need to actually validate the port (ex. 1 - 65535)
+        # @See https://stackoverflow.com/questions/40665068/python-regex-match-number-followed-by-string-or-nothing
         match_port = re.match(r'^\d+(?:/tcp.*|/udp)?$', column)
-        if len(match_port) > 0:
+        if match_port:
             port_columns.append(column)
 
     host_ports = []
